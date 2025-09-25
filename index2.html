@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freshers Quiz Game</title>
+  <style>
+    /* PARTY BACKGROUND */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(-45deg, #ff0099, #ff6600, #00ffff, #6600ff);
+      background-size: 400% 400%;
+      animation: gradientMove 8s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+      overflow: hidden;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .quiz-container {
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(10px);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      z-index: 1;
+      animation: popIn 0.8s ease;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    h1 {
+      font-size: 2.3rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #ff0099, #ffcc00, #00ffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(255, 0, 150, 0.8);
+      animation: glowPulse 1.5s infinite alternate;
+    }
+
+    @keyframes glowPulse {
+      from { text-shadow: 0 0 10px #ff0099, 0 0 20px #00ffff; }
+      to { text-shadow: 0 0 30px #ffcc00, 0 0 50px #ff0099; }
+    }
+
+    .question {
+      font-size: 1.4rem;
+      margin: 15px 0 20px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .option {
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .option:hover {
+      background: linear-gradient(45deg, #ff6600, #ff0099);
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+    }
+
+    /* Correct / Wrong Answer Colors */
+    .correct {
+      background: #28a745 !important;
+      border-color: #28a745;
+      box-shadow: 0 0 15px #28a745;
+    }
+
+    .wrong {
+      background: #dc3545 !important;
+      border-color: #dc3545;
+      box-shadow: 0 0 15px #dc3545;
+    }
+
+    .score {
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-top: 20px;
+      display: none;
+      color: #ffcc00;
+      animation: fadeIn 1s ease;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      background: linear-gradient(45deg, #00ffcc, #ff0099);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>🎉 B.Tech Freshers Quiz 🎉</h1>
+    <p class="question" id="question"></p>
+    <div class="options" id="options"></div>
+    <p class="score" id="score"></p>
+    <button id="restart" style="display: none;" onclick="restartQuiz()">Play Again</button>
+  </div>
+
+  <script>
+    const quizData = [
+      { question: "Which branch is known as the 'Mother of Engineering'?", options: ["Civil Engineering", "Mechanical Engineering", "Computer Science", "Electrical Engineering"], answer: "Civil Engineering" },
+      { question: "Which of these is NOT a programming language?", options: ["Python", "C++", "Java", "Google"], answer: "Google" },
+      { question: "What is the full form of CPU?", options: ["Central Processing Unit", "Control Program Unit", "Central Program Utility", "Computer Processing Utility"], answer: "Central Processing Unit" },
+      { question: "In which year do most students face 'placement pressure'?", options: ["1st Year", "2nd Year", "3rd Year", "Final Year"], answer: "Final Year" },
+      { question: "Which of these is the FIRST step in learning coding?", options: ["Copying from ChatGPT", "Understanding Logic", "Memorizing Syntax", "Running Code without Errors"], answer: "Understanding Logic" },
+      { question: "Ohm's law relates voltage with?", options: ["Resistance & Current", "Power & Energy", "Speed & Distance", "Force & Mass"], answer: "Resistance & Current" },
+      { question: "Which one is a first-year subject?", options: ["Operating Systems", "Strength of Materials", "Engineering Physics", "Data Science Projects"], answer: "Engineering Physics" },
+      { question: "Your seniors call you for 'Introduction Session', what should you do?", options: ["Run Away 😅", "Introduce Yourself", "Ignore Them", "Shout at Them"], answer: "Introduce Yourself" },
+      { question: "What is the symbol of Resistance?", options: ["Ω", "µ", "λ", "β"], answer: "Ω" },
+      { question: "Best way to survive engineering?", options: ["Make Friends", "Copy Assignments", "Study Smart", "All of the Above"], answer: "All of the Above" }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      const questionData = quizData[currentQuestion];
+      document.getElementById("question").textContent = questionData.question;
+      const optionsContainer = document.getElementById("options");
+      optionsContainer.innerHTML = "";
+
+      questionData.options.forEach(option => {
+        const btn = document.createElement("div");
+        btn.classList.add("option");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(btn, option);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(btn, selectedOption) {
+      const correctAnswer = quizData[currentQuestion].answer;
+      if (selectedOption === correctAnswer) {
+        btn.classList.add("correct");
+        score++;
+      } else {
+        btn.classList.add("wrong");
+        highlightCorrectOption(correctAnswer);
+      }
+
+      disableOptions();
+
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+          loadQuestion();
+        } else {
+          showScore();
+        }
+      }, 1000);
+    }
+
+    function highlightCorrectOption(correctAnswer) {
+      document.querySelectorAll(".option").forEach(opt => {
+        if (opt.textContent === correctAnswer) {
+          opt.classList.add("correct");
+        }
+      });
+    }
+
+    function disableOptions() {
+      document.querySelectorAll(".option").forEach(opt => {
+        opt.style.pointerEvents = "none";
+      });
+    }
+
+    function showScore() {
+      document.getElementById("question").style.display = "none";
+      document.getElementById("options").style.display = "none";
+      const scoreElement = document.getElementById("score");
+      scoreElement.textContent = `🎊 You scored ${score} / ${quizData.length}! 🎊`;
+      scoreElement.style.display = "block";
+      document.getElementById("restart").style.display = "inline-block";
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      document.getElementById("question").style.display = "block";
+      document.getElementById("options").style.display = "grid";
+      document.getElementById("score").style.display = "none";
+      document.getElementById("restart").style.display = "none";
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
